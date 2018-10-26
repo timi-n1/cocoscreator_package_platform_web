@@ -4,7 +4,10 @@ var crypto = require('crypto');
 
 module.exports = function(buildPath, cb){
     const indexFile = path.resolve(buildPath, './index.html');
+    // const dupFile = path.resolve(buildPath, './index2.html');
     Editor.warn('index file path : ', indexFile);
+
+    // fs.writeFileSync(dupFile, fs.readFileSync(indexFile));
     
     fs.readFile(indexFile, function(err, data) {
         if (err) return;

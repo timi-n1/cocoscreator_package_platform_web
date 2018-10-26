@@ -53,7 +53,8 @@ compressFunc['.png'] = function (done) {
         'res/atlas/loading',
         'atlas/shop/storehouse',
         'atlas/splash/splash',
-        'atlas/catsCategory/catsCategory'
+        'atlas/catsCategory/catsCategory',
+        'extend/guest_spine',
     ];
 
     glob(`${cwd}/**/*.png`, {}, function (er, files) {

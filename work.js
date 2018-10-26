@@ -59,15 +59,18 @@ module.exports = function (buildPath, allDone) {
         ['./']
     ).then(() => {
         Editor.log('打包到' + tarFile);
+        const packagePath = path.resolve(Editor.projectInfo.path, `./package.json`);
+        const json = JSON.parse( fs.readFileSync(packagePath).toString() );
+        Editor.log('上传中转' + json.cdnUploadUrl);
         const options = {
-            url: 'http://10.54.238.67:8080/n/cdn/sync',
+            url: json.cdnUploadUrl,
             headers: {
                 'content-type': 'multipart/form-data'
             }
         };
         const r = request.post(options, (err, httpResponse, body) => {
             if (err) {
-                Editor.log('上传失败', err);
+                Editor.log('上传失败(1):', err);
                 return;
             }
             try {
@@ -93,7 +96,7 @@ module.exports = function (buildPath, allDone) {
                 return;
             }
             else {
-                Editor.log('上传失败', `${body.data.msg}(${body.retcode})`);
+                Editor.log('上传失败(2):', `${body.data.msg}(${body.retcode})`);
                 return;
             }
         });
