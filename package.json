@@ -1,6 +1,6 @@
 {
     "name": "webgame-cdn",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "H5版本cdn资源管理",
     "author": "Cocos Creator",
     "main": "main.js",
