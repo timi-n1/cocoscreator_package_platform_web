@@ -10,7 +10,10 @@ let cwd = path.resolve(__dirname, '../../build/web-mobile');
 module.exports = function (buildPath, allDone) {
     cwd = buildPath;
     //删除.DS_Store文件
-    fs.unlinkSync( path.resolve(buildPath, './.DS_Store') );
+    const dsstorefile = path.resolve(buildPath, './.DS_Store');
+    if( fs.existsSync(dsstorefile) ){
+        fs.unlinkSync( dsstorefile );
+    }
     Editor.log('开始压缩资源');
     //资源类型检查
     const extCache = {};
