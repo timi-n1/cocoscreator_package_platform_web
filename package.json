@@ -1,12 +1,18 @@
 {
     "name": "webgame-cdn",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "H5版本cdn资源管理",
     "author": "Cocos Creator",
     "main": "main.js",
     "main-menu": {
         "Packages/平台/H5/上传测试版": {
             "message": "webgame-cdn:run-test"
+        },
+        "Packages/平台/H5/---------": {
+            "message": "webgame-cdn:igonre"
+        },
+        "Packages/平台/H5/--------- ": {
+            "message": "webgame-cdn:igonre"
         },
         "Packages/平台/H5/上传正式版": {
             "message": "webgame-cdn:run-online"
