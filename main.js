@@ -27,7 +27,7 @@ module.exports = {
 
                 require('./compress')(h5BuildPath, () => {
                     Editor.Ipc.sendToPanel('webgame-cdn', 'update-status', '准备上传资源');
-                    require('./work')(h5BuildPath, (remotePath)=>{
+                    require('./cdn_upload')(h5BuildPath, (remotePath)=>{
                         Editor.Ipc.sendToPanel('webgame-cdn', 'update-status', '资源上传成功，准备生成二维码');
                         const indexPath = `https://h5game.qq.com/${remotePath}/${indexFileName}?business=game&hidetitlebar=1&hidestatusbar=1&backconfirm=1`;
                         Editor.success('测试访问地址:', indexPath);
@@ -62,7 +62,7 @@ module.exports = {
 
             require('./compress')(h5BuildPath, () => {
                 Editor.Ipc.sendToPanel('webgame-cdn', 'update-status', '准备上传资源');
-                require('./work')(h5BuildPath, (remotePath)=>{
+                require('./cdn_upload')(h5BuildPath, (remotePath)=>{
                     Editor.Ipc.sendToPanel('webgame-cdn', 'update-status', '资源上传成功，准备生成二维码');
                     const indexPath = `https://h5game.qq.com/${remotePath}/index.html?business=game&hidetitlebar=1&hidestatusbar=1&backconfirm=1`;
                     Editor.success('正式访问地址:', indexPath);
