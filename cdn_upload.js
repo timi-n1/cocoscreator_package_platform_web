@@ -13,7 +13,7 @@ function computePackageSize(buildPath){
 }
 
 module.exports = function (buildPath, allDone) {
-    Editor.success('[h5版本]开始自动处理资源到cdn');
+    
     const cwd = buildPath;
     const path = require('path');
     const fs = require('fs-extra');
@@ -29,31 +29,61 @@ module.exports = function (buildPath, allDone) {
 
     let upLoadUrl = packageJson.cdnUploadAPI;
     let remotePath = packageJson.h5Path;
+    let full_upload = packageJson.full_upload;
 
-    // const removePathList = [
-    //     './res/raw-assets/resources/dynamic',
-    //     './res/raw-internal'
-    // ];
-    // //在import目录寻找较大的文件，加入到removePathList
-    // const list = glob.sync(path.resolve(cwd, `./res/import/**/*.json`), {});
-    // list.forEach((file)=>{
-    //     const size = (fs.statSync(file).size/1024).toFixed(0);
-    //     if( size > 25 ){
-    //         // Editor.log(path.relative(cwd, file)+' = '+size+'kb');
-    //         removePathList.push(path.relative(cwd, file));
-    //     }
-    // });
+    let oldFiles = [];
+    let newFiles = [];
+    let totalFiles = [];
+    let uploadFiles = [];
+    const cdnUploadCacheFilePath = path.resolve(__dirname, './cdn_upload_cache/old_files_list.json');
+    Editor.log(cdnUploadCacheFilePath);
+    if(fs.existsSync(cdnUploadCacheFilePath)){
+        Editor.log('cdn cache文件存在');
+        oldFiles = JSON.parse(fs.readFileSync(cdnUploadCacheFilePath).toString());
+    }else{
+        Editor.log('cdn cache文件不存在');
+    }
+
     
 
     // let fileLen = fs.statSync(filePath).size;
     let successCount = 0;
     let failedCount = 0;
 
-    Editor.log(`远程目录：${remotePath}`);
-    //const h5Path = path.resolve(buildPath, '../');
+    
     glob(`${buildPath}/**/*.*`, {}, function (er, files) {
+
+        Editor.success('需要上传文件列表：');
+        if(full_upload){
+            uploadFiles = files;
+            totalFiles = files.concat();
+        }else{
+            for(let i = 0; i < files.length; i++){
+                let f_subPath = files[i].slice(buildPath.length+1);
+                if("index.html" == f_subPath || !oldFiles.includes(f_subPath)){
+                    //新增文件
+                    uploadFiles.push(files[i]);
+                    newFiles.push(f_subPath);
+                    Editor.success(f_subPath);
+                }
+            }
+            totalFiles = oldFiles.concat(newFiles);
+        }
+        let index = totalFiles.indexOf('index.html');
+        if(index >= 0){
+            totalFiles.splice(index, 1);
+        }
+
+        if(0 == uploadFiles.length){
+            Editor.success('无');
+            computePackageSize(buildPath);
+            allDone && allDone(remotePath);
+            return ;
+        }
+        Editor.success('[h5版本]开始上传资源文件到cdn');
+        Editor.log(`远程目录：${remotePath}`);
         //逐个资源处理
-        async.eachOfSeries(files, (file, key, cb) => {
+        async.eachOfSeries(uploadFiles, (file, key, cb) => {
             let filePath = file;
             let subPath = filePath.slice(buildPath.length+1);
             Editor.log(`上传${subPath}`);
@@ -85,16 +115,15 @@ module.exports = function (buildPath, allDone) {
                 cb();
             });
         }, ()=>{
-            Editor.success(`执行上传文件总数：${files.length}，成功上传数：${successCount}，失败上传数：${failedCount}`);
-            // removePathList.forEach((removePath)=>{
-            //     fs.removeSync( path.resolve(cwd, removePath) );
-            // });
-            // // fs.removeSync(resPath);
-            // Editor.log('包体res目录清理成功!');
+            Editor.success(`执行上传文件总数：${uploadFiles.length}，成功上传数：${successCount}，失败上传数：${failedCount}`);
+
             Editor.success('[h5版本]资源处理到cdn完毕!');
             computePackageSize(buildPath);
-            allDone(remotePath);
+
+            fs.writeFileSync(cdnUploadCacheFilePath, JSON.stringify(totalFiles), 'utf8');
+            allDone && allDone(remotePath);
         });
     })
+
 
 }
